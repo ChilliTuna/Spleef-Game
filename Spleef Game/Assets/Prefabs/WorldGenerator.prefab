@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4627321322051469733}
   m_Layer: 0
   m_Name: WorldGenerator
-  m_TagString: Untagged
+  m_TagString: GameController
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -45,8 +45,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tileObject: {fileID: 390438304430913490, guid: c0e252191b8164a41af91a342f4f9964, type: 3}
-  width: 10
-  length: 10
+  width: 20
+  length: 20
   spacing: 1
-  origin: {x: 0, y: 0, z: 0}
+  origin: {x: 0, y: -0.25, z: 0}
   allTiles: []

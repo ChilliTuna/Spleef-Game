@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public enum PlatformShapes
@@ -16,9 +14,11 @@ public class WorldGenerator : MonoBehaviour
     //Radius of the platform in number of tiles
     [Min(1)]
     private int radius = 10;
+
     //Width of the platform in number of tiles
     [Min(1)]
     public int width = 10;
+
     //Length of the platform in number of tiles
     [Min(1)]
     public int length = 10;
@@ -32,7 +32,7 @@ public class WorldGenerator : MonoBehaviour
     public List<GameObject> allTiles;
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         allTiles = new List<GameObject>();
 
@@ -40,9 +40,8 @@ public class WorldGenerator : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        
     }
 
     public int CalculateMaxTileCount()
@@ -61,7 +60,7 @@ public class WorldGenerator : MonoBehaviour
         }
     }
 
-    void InstantiateTiles()
+    private void InstantiateTiles()
     {
         allTiles.Clear();
         for (int i = 0; i < CalculateMaxTileCount(); i++)
@@ -70,14 +69,14 @@ public class WorldGenerator : MonoBehaviour
         }
     }
 
-    void GeneratePlatform()
+    private void GeneratePlatform()
     {
         int tileCount = CalculateMaxTileCount();
         if (allTiles.Count < tileCount)
         {
             InstantiateTiles();
         }
-        for(int i = 0; i < tileCount; i++)
+        for (int i = 0; i < tileCount; i++)
         {
             allTiles[i].SetActive(true);
             Vector3 tilePos = allTiles[i].transform.position;
