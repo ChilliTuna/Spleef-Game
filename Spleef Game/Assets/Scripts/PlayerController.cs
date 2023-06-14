@@ -1,6 +1,3 @@
-using System.Linq;
-using Unity.VisualScripting;
-using Unity.VisualScripting.InputSystem;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -23,10 +20,8 @@ public class PlayerController : MonoBehaviour
 
     private GameObject mainCam;
 
-    [SerializeField]
-    private Vector2 camAngle;
+    private float camAngle;
 
-    [SerializeField]
     private Vector2 inputVec;
 
     private void Start()
@@ -48,17 +43,17 @@ public class PlayerController : MonoBehaviour
     {
         return new Vector3(vec2Move.x, 0, vec2Move.y);
     }
+
     private void GetCameraAngle()
     {
         Vector3 realAngle = (worldGenerator.origin - mainCam.transform.position).normalized;
-        camAngle = new Vector2(realAngle.x, realAngle.z);
+        camAngle = Vector2.SignedAngle(new Vector2(realAngle.x, realAngle.z), new Vector2(0, 1));
     }
 
     private void OnMove(InputValue inputVal)
     {
         inputVec = inputVal.Get<Vector2>();
-        vec2Move = (camAngle * inputVec.y + new Vector2(-camAngle.x, camAngle.y) * inputVec.x).normalized * moveSpeed;
-        
+        vec2Move = Quaternion.AngleAxis(camAngle, -Vector3.forward) * inputVec.normalized * moveSpeed;
     }
 
     private void MoveChar()
@@ -67,5 +62,4 @@ public class PlayerController : MonoBehaviour
 
         characterController.Move(vec3Move);
     }
-
 }
