@@ -52,4 +52,5 @@ MonoBehaviour:
   origin: {x: 0, y: -0.25, z: 0}
   platformShape: 1
   allTiles: []
-  parentGameObject: {fileID: 0}
+  spawnPlatformOnLoad: 0
+  existingDynamicPlatform: 0
