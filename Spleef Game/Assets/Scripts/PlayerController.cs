@@ -6,6 +6,9 @@ public class PlayerController : MonoBehaviour
     public float moveSpeed = 1f;
 
     [SerializeField]
+    private float maxSpeed = 5f;
+
+    [SerializeField]
     private float spawnHeight;
 
     [SerializeField]
@@ -24,24 +27,36 @@ public class PlayerController : MonoBehaviour
 
     private Vector2 inputVec;
 
+    private Rigidbody rigidBody;
+
+    private PlayerGroundChecker groundChecker;
+
+    public Vector3 vel;
+
     private void Start()
     {
         characterController = GetComponent<CharacterController>();
         spawnHeight = transform.position.y;
         worldGenerator = GameObject.FindGameObjectWithTag("GameController").GetComponent<WorldGenerator>();
         mainCam = GameObject.FindGameObjectWithTag("MainCamera");
+        rigidBody = GetComponent<Rigidbody>();
+        groundChecker = transform.Find("GroundChecker").gameObject.GetComponent<PlayerGroundChecker>();
         GetCameraAngle();
     }
 
     private void Update()
     {
+        if(groundChecker.currentCollisions > 0)
+        {
+            rigidBody.maxLinearVelocity = maxSpeed;
+            //rigidBody.
+        }
+        else
+        {
+            rigidBody.maxLinearVelocity = 100;
+        }
+        vel = rigidBody.velocity;
         MoveChar();
-    }
-
-    //Changes y input to z movement
-    private Vector3 ConstructMoveVec(Vector2 moveInput)
-    {
-        return new Vector3(vec2Move.x, 0, vec2Move.y);
     }
 
     private void GetCameraAngle()
@@ -56,10 +71,17 @@ public class PlayerController : MonoBehaviour
         vec2Move = Quaternion.AngleAxis(camAngle, -Vector3.forward) * inputVec.normalized * moveSpeed;
     }
 
+    //Changes y input to z movement
+    private Vector3 ConstructMoveVec(Vector2 moveInput)
+    {
+        return new Vector3(moveInput.x, 0, moveInput.y);
+    }
+
     private void MoveChar()
     {
-        vec3Move = ConstructMoveVec(vec2Move) * Time.deltaTime;
+        vec3Move = ConstructMoveVec(vec2Move);
 
-        characterController.Move(vec3Move);
+        rigidBody.AddForce(vec3Move);
+        //characterController.Move(vec3Move);
     }
 }
