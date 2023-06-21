@@ -33,6 +33,8 @@ public class PlayerController : MonoBehaviour
 
     public Vector3 vel;
 
+    private ForceMode forceMode = ForceMode.Acceleration;
+
     private void Start()
     {
         characterController = GetComponent<CharacterController>();
@@ -49,11 +51,14 @@ public class PlayerController : MonoBehaviour
         if(groundChecker.currentCollisions > 0)
         {
             rigidBody.maxLinearVelocity = maxSpeed;
-            //rigidBody.
+            forceMode = ForceMode.Acceleration;
+            rigidBody.drag = 10;
         }
         else
         {
-            rigidBody.maxLinearVelocity = 100;
+            rigidBody.maxLinearVelocity = 1000;
+            forceMode = ForceMode.Force;
+            rigidBody.drag = 0;
         }
         vel = rigidBody.velocity;
         MoveChar();
@@ -81,7 +86,7 @@ public class PlayerController : MonoBehaviour
     {
         vec3Move = ConstructMoveVec(vec2Move);
 
-        rigidBody.AddForce(vec3Move);
+        rigidBody.AddForce(vec3Move, forceMode);
         //characterController.Move(vec3Move);
     }
 }
