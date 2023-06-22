@@ -3,19 +3,36 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    public float moveSpeed = 1f;
+    public float force = 100f;
+
+    public float midAirForce = 10f;
 
     [SerializeField]
-    private float maxSpeed = 5f;
+    private float maxSpeed = 10f;
 
     [SerializeField]
-    private float spawnHeight;
+    private Vector3 spawnPosition;
+
+    [SerializeField]
+    private float despawnHeight = -5f;
 
     [SerializeField]
     private Vector2 vec2Move;
 
     [SerializeField]
     private Vector3 vec3Move;
+
+    [SerializeField]
+    private Vector3 vel;
+
+    [SerializeField]
+    private bool inAir = false;
+
+    [SerializeField]
+    private PhysicMaterial standardMaterial;
+
+    [SerializeField]
+    private PhysicMaterial inAirMaterial;
 
     private CharacterController characterController;
 
@@ -31,14 +48,15 @@ public class PlayerController : MonoBehaviour
 
     private PlayerGroundChecker groundChecker;
 
-    public Vector3 vel;
-
     private ForceMode forceMode = ForceMode.Acceleration;
+
+    private CapsuleCollider capsuleCollider;
 
     private void Start()
     {
         characterController = GetComponent<CharacterController>();
-        spawnHeight = transform.position.y;
+        capsuleCollider = GetComponent<CapsuleCollider>();
+        spawnPosition = transform.position;
         worldGenerator = GameObject.FindGameObjectWithTag("GameController").GetComponent<WorldGenerator>();
         mainCam = GameObject.FindGameObjectWithTag("MainCamera");
         rigidBody = GetComponent<Rigidbody>();
@@ -48,20 +66,44 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        if(groundChecker.currentCollisions > 0)
+        if (groundChecker.currentCollisions > 0)
         {
-            rigidBody.maxLinearVelocity = maxSpeed;
-            forceMode = ForceMode.Acceleration;
-            rigidBody.drag = 10;
+            OnGround();
         }
         else
         {
-            rigidBody.maxLinearVelocity = 1000;
-            forceMode = ForceMode.Force;
-            rigidBody.drag = 0;
+            InAir();
         }
         vel = rigidBody.velocity;
         MoveChar();
+    }
+
+    private void OnGround()
+    {
+        if (inAir == true)
+        {
+            inAir = false;
+            rigidBody.maxLinearVelocity = maxSpeed;
+            forceMode = ForceMode.Acceleration;
+            rigidBody.drag = 10;
+            capsuleCollider.material = standardMaterial;
+        }
+    }
+
+    private void InAir()
+    {
+        if (inAir == false)
+        {
+            inAir = true;
+            rigidBody.maxLinearVelocity = 100;
+            forceMode = ForceMode.Force;
+            rigidBody.drag = 0;
+            capsuleCollider.material = inAirMaterial;
+        }
+        if (transform.position.y <= despawnHeight)
+        {
+            Respawn();
+        }
     }
 
     private void GetCameraAngle()
@@ -73,7 +115,7 @@ public class PlayerController : MonoBehaviour
     private void OnMove(InputValue inputVal)
     {
         inputVec = inputVal.Get<Vector2>();
-        vec2Move = Quaternion.AngleAxis(camAngle, -Vector3.forward) * inputVec.normalized * moveSpeed;
+        vec2Move = Quaternion.AngleAxis(camAngle, -Vector3.forward) * inputVec.normalized * force;
     }
 
     //Changes y input to z movement
@@ -88,5 +130,11 @@ public class PlayerController : MonoBehaviour
 
         rigidBody.AddForce(vec3Move, forceMode);
         //characterController.Move(vec3Move);
+    }
+
+    private void Respawn()
+    {
+        transform.position = spawnPosition;
+        rigidBody.velocity = Vector3.zero;
     }
 }

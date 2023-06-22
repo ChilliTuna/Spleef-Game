@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7597469953881863175}
   - component: {fileID: 3808101502812285632}
   - component: {fileID: 9078581459100998399}
+  - component: {fileID: 6706259712380500827}
   m_Layer: 6
   m_Name: GroundChecker
   m_TagString: Untagged
@@ -26,8 +27,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2996912817501446723}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.91, z: 0}
-  m_LocalScale: {x: 1, y: 0.1, z: 1}
+  m_LocalPosition: {x: 0, y: -1, z: 0}
+  m_LocalScale: {x: 0.8, y: 0.1, z: 0.8}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 205998434370514298}
@@ -63,6 +64,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &6706259712380500827
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2996912817501446723}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b05ce63751ca884682dbe8ba6bbc323, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentCollisions: 0
 --- !u!1 &8359580917306710017
 GameObject:
   m_ObjectHideFlags: 0
@@ -74,10 +88,12 @@ GameObject:
   - component: {fileID: 205998434370514298}
   - component: {fileID: 4549802089214208323}
   - component: {fileID: 5038430483082617396}
+  - component: {fileID: 304548099919272887}
   - component: {fileID: 6144940921592648028}
+  - component: {fileID: 8943092959799443299}
   - component: {fileID: 1871582609877162253}
   - component: {fileID: 6418946784604521496}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -150,6 +166,29 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!136 &304548099919272887
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8359580917306710017}
+  m_Material: {fileID: 13400000, guid: 640dc20ace2d2e045bc978f5f84de1c4, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 64
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!143 &6144940921592648028
 CharacterController:
   m_ObjectHideFlags: 0
@@ -163,11 +202,11 @@ CharacterController:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Height: 2
   m_Radius: 0.5
@@ -176,6 +215,33 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!54 &8943092959799443299
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8359580917306710017}
+  serializedVersion: 4
+  m_Mass: 20
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 64
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 1
+  m_Constraints: 112
+  m_CollisionDetection: 1
 --- !u!114 &1871582609877162253
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -218,7 +284,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a35b1675a7cd284496c53a5bcf70186, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 10
-  spawnHeight: 0
+  force: 100
+  midAirForce: 10
+  maxSpeed: 7
+  spawnPosition: {x: 0, y: 0, z: 0}
+  despawnHeight: -5
   vec2Move: {x: 0, y: 0}
   vec3Move: {x: 0, y: 0, z: 0}
+  vel: {x: 0, y: 0, z: 0}
+  inAir: 0
+  standardMaterial: {fileID: 13400000, guid: cc6de990c2ae10546965a60212de1579, type: 2}
+  inAirMaterial: {fileID: 13400000, guid: 640dc20ace2d2e045bc978f5f84de1c4, type: 2}

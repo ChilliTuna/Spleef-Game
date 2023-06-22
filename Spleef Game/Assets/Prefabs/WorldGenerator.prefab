@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tileObject: {fileID: 390438304430913490, guid: c0e252191b8164a41af91a342f4f9964, type: 3}
-  radius: 10
+  radius: 30
   width: 20
   length: 20
   spacing: 1
