@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public enum PlatformShapes
@@ -10,8 +11,12 @@ public enum PlatformShapes
 public class WorldGenerator : MonoBehaviour
 {
     [Header("Platform Details")]
+    
     [Tooltip("GameObject to be used as tile")]
     public GameObject tileObject;
+    
+    [Tooltip("GameObject to be used as platform base object")]
+    public GameObject platformBaseObject;
 
     //Radius of the platform in number of tiles
     [Min(1)]
@@ -40,7 +45,7 @@ public class WorldGenerator : MonoBehaviour
     private PlatformShapes platformShape = PlatformShapes.Square;
 
     [HideInInspector]
-    public List<GameObject> allTiles;
+    public List<GameObject> dynamicTiles;
 
     private GameObject parentGameObject;
 
@@ -66,14 +71,15 @@ public class WorldGenerator : MonoBehaviour
 
     public void Initialise()
     {
-        if (allTiles == null)
+        if (dynamicTiles == null)
         {
-            allTiles = new List<GameObject>();
+            dynamicTiles = new List<GameObject>();
         }
         if (parentGameObject == null)
         {
-            parentGameObject = new GameObject();
+            parentGameObject = Instantiate(platformBaseObject);
             parentGameObject.name = GeneratePlatformParentName("Dynamic");
+            parentGameObject.GetComponent<PlatformBase>().allTiles = dynamicTiles;
             currentPlatformNumber += 1;
         }
         GeneratePlatform();
@@ -97,11 +103,11 @@ public class WorldGenerator : MonoBehaviour
 
     private void InstantiateTiles()
     {
-        int initialTileCount = CalculateMaxTileCount() - allTiles.Count;
+        int initialTileCount = CalculateMaxTileCount() - dynamicTiles.Count;
         for (int i = 0; i < initialTileCount; i++)
         {
-            allTiles.Add(Instantiate(tileObject));
-            allTiles[i].transform.parent = parentGameObject.transform;
+            dynamicTiles.Add(Instantiate(tileObject));
+            dynamicTiles[i].transform.parent = parentGameObject.transform;
         }
     }
 
@@ -109,12 +115,12 @@ public class WorldGenerator : MonoBehaviour
     {
         if (existingDynamicPlatform)
         {
-            for (int i = 0; i < allTiles.Count; i++)
+            for (int i = 0; i < dynamicTiles.Count; i++)
             {
-                DestroyImmediate(allTiles[i]);
+                DestroyImmediate(dynamicTiles[i]);
             }
-            allTiles.Clear();
-            allTiles = null;
+            dynamicTiles.Clear();
+            dynamicTiles = null;
             DestroyImmediate(parentGameObject);
             parentGameObject = null;
             existingDynamicPlatform = false;
@@ -125,8 +131,7 @@ public class WorldGenerator : MonoBehaviour
     {
         if (existingDynamicPlatform)
         {
-            allTiles.Clear();
-            allTiles = null;
+            dynamicTiles = null;
             parentGameObject.name = GeneratePlatformParentName("Static");
             currentPlatformNumber += 1;
             parentGameObject = null;
@@ -140,7 +145,7 @@ public class WorldGenerator : MonoBehaviour
     public void GeneratePlatform()
     {
         int tileCount = CalculateMaxTileCount();
-        if (allTiles.Count < tileCount)
+        if (dynamicTiles.Count < tileCount)
         {
             InstantiateTiles();
         }
@@ -150,19 +155,19 @@ public class WorldGenerator : MonoBehaviour
             for (int i = 0; i < tileCount; i++)
             {
                 int diameter = radius * 2;
-                Vector3 tilePos = allTiles[i].transform.position;
+                Vector3 tilePos = dynamicTiles[i].transform.position;
                 tilePos.x = origin.x + spacing * (i % diameter + spacing / 2) - radius;
                 tilePos.z = origin.z + spacing * (i / diameter + spacing / 2) - radius;
                 tilePos.y = origin.y;
-                allTiles[i].transform.position = tilePos;
+                dynamicTiles[i].transform.position = tilePos;
                 if ((tilePos - origin).magnitude <= radius)
                 {
-                    allTiles[i].SetActive(true);
-                    allTiles[i].name = "Tile " + ((i % diameter - radius) + ", " + (i / diameter - radius));
+                    dynamicTiles[i].SetActive(true);
+                    dynamicTiles[i].name = "Tile " + ((i % diameter - radius) + ", " + (i / diameter - radius));
                 }
                 else
                 {
-                    allTiles[i].SetActive(false);
+                    dynamicTiles[i].SetActive(false);
                 }
             }
         }
@@ -170,16 +175,17 @@ public class WorldGenerator : MonoBehaviour
         {
             for (int i = 0; i < tileCount; i++)
             {
-                Vector3 tilePos = allTiles[i].transform.position;
+                Vector3 tilePos = dynamicTiles[i].transform.position;
                 tilePos.x = origin.x + spacing * (i % width + spacing / 2) - (width / 2);
                 tilePos.z = origin.z + spacing * (i / length + spacing / 2) - (length / 2);
                 tilePos.y = origin.y;
-                allTiles[i].transform.position = tilePos;
-                allTiles[i].SetActive(true);
-                allTiles[i].name = "Tile " + ((i % width) - (width / 2)) + ", " + ((i / length) - (length / 2));
+                dynamicTiles[i].transform.position = tilePos;
+                dynamicTiles[i].SetActive(true);
+                dynamicTiles[i].name = "Tile " + ((i % width) - (width / 2)) + ", " + ((i / length) - (length / 2));
             }
         }
         existingDynamicPlatform = true;
+        parentGameObject.GetComponent<PlatformBase>().allTiles = dynamicTiles;
     }
 
     /// <summary>
@@ -188,7 +194,7 @@ public class WorldGenerator : MonoBehaviour
     public void GenerateStaticPlatform()
     {
         List<GameObject> staticTiles = new List<GameObject>();
-        GameObject staticPlatformParent = new GameObject();
+        GameObject staticPlatformParent = Instantiate(platformBaseObject);
         staticPlatformParent.name = GeneratePlatformParentName("Static");
         currentPlatformNumber += 1;
         int tileCount = CalculateMaxTileCount();
@@ -232,6 +238,7 @@ public class WorldGenerator : MonoBehaviour
                 staticTiles[i].name = "Tile " + ((i % width) - (width / 2)) + ", " + ((i / length) - (length / 2));
             }
         }
+        parentGameObject.GetComponent<PlatformBase>().allTiles = staticTiles;
     }
 
     private string GeneratePlatformParentName(string staticness)

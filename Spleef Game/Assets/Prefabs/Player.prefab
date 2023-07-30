@@ -286,7 +286,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   force: 100
   midAirForce: 10
-  maxSpeed: 7
+  maxSpeed: 10
   spawnPosition: {x: 0, y: 0, z: 0}
   despawnHeight: -5
   vec2Move: {x: 0, y: 0}
