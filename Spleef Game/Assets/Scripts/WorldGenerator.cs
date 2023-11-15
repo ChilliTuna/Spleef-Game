@@ -54,6 +54,9 @@ public class WorldGenerator : MonoBehaviour
     [Tooltip("Should a platform spawn on game start? This option will usually be false if you want to make a custom platform. \nTo make a custom platform, disable this variable and press the \"Generate Platform\" button below.")]
     public bool spawnPlatformOnLoad = true;
 
+    [Tooltip("Should excess tiles be culled for static platforms generated henceforth? \nThis will destroy the invisible tiles of static platforms upon generation, such as those around the circle platform shapes. \nDisabling this may have unintended side effects, but may slightly improve static platform generation times.")]
+    public bool cullExcessStaticTiles = true;
+
     [Tooltip("This field is just for debug purposes, to help keep track of the platforms generated so far")]
     public bool existingDynamicPlatform = false;
 
@@ -77,8 +80,7 @@ public class WorldGenerator : MonoBehaviour
         }
         if (parentGameObject == null)
         {
-            parentGameObject = Instantiate(platformBaseObject);
-            parentGameObject.name = GeneratePlatformParentName("Dynamic");
+            parentGameObject = GeneratePlatformParent(false);
             parentGameObject.GetComponent<PlatformBase>().allTiles = dynamicTiles;
             currentPlatformNumber += 1;
         }
@@ -132,7 +134,7 @@ public class WorldGenerator : MonoBehaviour
         if (existingDynamicPlatform)
         {
             dynamicTiles = null;
-            parentGameObject.name = GeneratePlatformParentName("Static");
+            parentGameObject.name = GeneratePlatformParentName(true);
             currentPlatformNumber += 1;
             parentGameObject = null;
             existingDynamicPlatform = false;
@@ -194,8 +196,7 @@ public class WorldGenerator : MonoBehaviour
     public void GenerateStaticPlatform()
     {
         List<GameObject> staticTiles = new List<GameObject>();
-        GameObject staticPlatformParent = Instantiate(platformBaseObject);
-        staticPlatformParent.name = GeneratePlatformParentName("Static");
+        GameObject staticPlatformParent = GeneratePlatformParent(true);
         currentPlatformNumber += 1;
         int tileCount = CalculateMaxTileCount();
         for (int i = 0; i < tileCount; i++)
@@ -238,11 +239,38 @@ public class WorldGenerator : MonoBehaviour
                 staticTiles[i].name = "Tile " + ((i % width) - (width / 2)) + ", " + ((i / length) - (length / 2));
             }
         }
-        parentGameObject.GetComponent<PlatformBase>().allTiles = staticTiles;
+        List<GameObject> finalTiles;
+        if(cullExcessStaticTiles)
+        {
+            finalTiles = new List<GameObject>();
+            for (int i = 0; i < tileCount; i++)
+            {
+                if (staticTiles[i].activeInHierarchy == false)
+                {
+                    GameObject.DestroyImmediate(staticTiles[i]);
+                }
+                else
+                {
+                    finalTiles.Add(staticTiles[i]);
+                }
+            }
+        }
+        else
+        {
+            finalTiles = staticTiles;
+        }
+        parentGameObject.GetComponent<PlatformBase>().allTiles = finalTiles;
     }
 
-    private string GeneratePlatformParentName(string staticness)
+    private GameObject GeneratePlatformParent(bool isStatic)
     {
-        return "Platform " + platformShape + currentPlatformNumber + " (" + staticness +")";
+        GameObject parent = Instantiate(platformBaseObject);
+        parent.name = GeneratePlatformParentName(isStatic);
+        return parent;
+    }
+
+    private string GeneratePlatformParentName(bool isStatic)
+    {
+        return "Platform " + platformShape + currentPlatformNumber + " (" + (isStatic ? "Static" : "Dynamic") +")";
     }
 }

@@ -45,7 +45,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66b9ba99f1a203b4b8c75b745e6e489b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  meteorSpawner: {fileID: 681078856531862424}
+  allTiles: []
+  activeTiles: []
 --- !u!114 &681078856531862424
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58,6 +59,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e35508dd14e17e744a7f46025aceab03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  meteorObject: {fileID: 8141547782175174460, guid: c94c7e6eea77d1a48ac63a565bb8ff35, type: 3}
-  shouldBeSpawning: 0
+  meteorBaseObject: {fileID: 8141547782175174460, guid: c94c7e6eea77d1a48ac63a565bb8ff35, type: 3}
+  shouldBeSpawning: 1
   spawnTime: 3
+  spawnPosition: {x: 0, y: 20, z: 0}
