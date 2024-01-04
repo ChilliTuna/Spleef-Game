@@ -62,4 +62,5 @@ MonoBehaviour:
   meteorBaseObject: {fileID: 8141547782175174460, guid: c94c7e6eea77d1a48ac63a565bb8ff35, type: 3}
   shouldBeSpawning: 1
   spawnTime: 3
+  targetingMode: 1
   spawnPosition: {x: 0, y: 20, z: 0}
