@@ -1,9 +1,16 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class MeteorSpawner : MonoBehaviour
 {
+    public enum MeteorTargetingModes
+    {
+        Scan,
+        Random
+    }
+
     public GameObject meteorBaseObject;
 
     public bool shouldBeSpawning = false;
@@ -11,6 +18,8 @@ public class MeteorSpawner : MonoBehaviour
     private bool isSpawning = false;
 
     public float spawnTime = 3f;
+
+    public MeteorTargetingModes targetingMode = MeteorTargetingModes.Random;
 
     public Vector3 spawnPosition;
 
@@ -21,6 +30,8 @@ public class MeteorSpawner : MonoBehaviour
     private List<GameObject> freeMeteors;
 
     private List<GameObject> meteorTargetOrder;
+
+    private bool isTargetOrderEstablished = false;
 
     // Start is called before the first frame update
     private void Start()
@@ -39,7 +50,6 @@ public class MeteorSpawner : MonoBehaviour
             spawnPosition = transform.position;
             spawnPosition.y += 10f;
         }
-        GetMeteorTargetOrder();
     }
 
     // Update is called once per frame
@@ -47,6 +57,10 @@ public class MeteorSpawner : MonoBehaviour
     {
         if (shouldBeSpawning)
         {
+            if(!isTargetOrderEstablished)
+            {
+                GetMeteorTargetOrder();
+            }
             if (isSpawning == false)
             {
                 StartCoroutine(DoSpawning());
@@ -88,9 +102,19 @@ public class MeteorSpawner : MonoBehaviour
 
     private void GetMeteorTargetOrder()
     {
-        //Scan type target order
-        meteorTargetOrder = platform.activeTiles;
-        //Introduce random target order. (Shuffle above order somehow)
+        isTargetOrderEstablished = true;
+        if (targetingMode == MeteorTargetingModes.Scan)
+        {
+            //Scan type target order
+            meteorTargetOrder = platform.activeTiles;
+        }
+        else if(targetingMode == MeteorTargetingModes.Random)
+        {
+            platform.activeTiles.Shuffle();
+            meteorTargetOrder = platform.activeTiles;
+            //Introduce random target order. (Shuffle active tiles somehow)
+        }
+        // If no targeting mode, don't sort
     }
 
     private GameObject GetTargetTile()
